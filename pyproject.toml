@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "mid"
+version = "0.1.0"
+description = "Schedule service for checking companies websites on new meetup events"
+authors = ["Flict-dev <zhdanom.maksi@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "^3.0.0b9"
+asyncpg = "^0.28.0"
+beautifulsoup4 = "^4.12.2"
+requests = "^2.31.0"
+pydantic = "^2.1.1"
+user-agent = "^0.1.10"
+aiofiles = "^23.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+isort = "^5.12.0"
+pre-commit = "^3.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
