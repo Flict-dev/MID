@@ -1,78 +1,94 @@
-import json
-from abc import ABC
+from datetime import date
 from logging import Logger
-from typing import Dict
+from time import perf_counter
+from typing import List
 
-import aiofiles
-from aiohttp import ClientSession
-from bs4 import BeautifulSoup
-from user_agent import generate_user_agent
+import dateparser
+from bs4 import BeautifulSoup, Tag
+
+from events.schemes import EventBase, ParserCard, ParserCardField
 
 logger = Logger(__file__)
 
 
-class LocalStorage:
-    """
-    Yes, I know it's better to use mongodb for storing data,
-    which is used for scheduled tasks,
-    but this is my project and I do whatever I want {^_^}
-    """
+class SuperParser:
+    def __init__(self) -> None:
+        pass
 
-    def __init__(self, path: str) -> None:
-        raw = self.__read_data()
-        self.path = path
-        self.__storage = {k: set(v) for k, v in raw.items()}
+    def _parce_container(self, obj: Tag, data: ParserCardField) -> List[Tag]:
+        container = obj.find(data.name, class_=data.class_)
+        if not container:
+            logger.error(f"The container was not found in the code!\nHTML: {obj}")
+        return container
 
-    async def __read_data(self) -> Dict[str, list]:
-        async with aiofiles.open(self.path, "r", encoding="utf-8") as f:
-            return json.loads(await f.read())
+    def _parce_events(self, obj: Tag, data: ParserCardField) -> List[Tag]:
+        events = obj.find_all(data.name, class_=data.class_)
+        if not events:
+            logger.error(f"Events not found in the container!\nHTML: {obj}")
+        return events
 
-    async def __write_data(self, data: Dict[str, list]):
-        async with aiofiles.open(self.path, "w", encoding="utf-8") as f:
-            json_object = json.dumps(data, indent=4)
-            await f.write(json_object)
+    def _parce_title(self, class_name: str) -> str:
+        ...
 
-    def __check_object_type(self, object_type: str) -> bool:
-        if object_type not in self.__storage.keys():
-            logger.error(f"Such type as <{object_type}> doesn't exist!")
-            return False
-        return True
+    def _parce_city(self, class_name: str) -> str:
+        ...
 
-    async def check_object(self, object: str, object_type: str = "events") -> bool:
-        if self.__check_object_type(object_type):
-            return object in self.__storage[object_type]
+    def _parce_date(self, obj: Tag, data: ParserCardField) -> date:
+        raw_date = obj.find(
+            data.name, class_=data.class_
+        )  # Think about yandex format "frontend idiots"
+        normolized_date = dateparser.parse(raw_date)
 
-    async def add_object(self, object: str, object_type: str = "events"):
-        if self.__check_object_type(object_type):
-            self.__storage[object_type].add(object)
-        data = {k: list(v) for k, v in self.__storage.items()}
-        await self.__write_data(data)
+    def _parce_preview_link(self, class_name: str) -> str:
+        ...
 
-    async def remove_object(self, object: str, object_type: str = "events"):
-        if self.__check_object_type(object_type):
-            self.__storage[object_type].remove(object)
-        data = {k: list(v) for k, v in self.__storage.items()}
-        await self.__write_data(data)
+    def _parce_page_link(self, class_name: str) -> str:
+        ...
+
+    def parce_event(self, text: str, doc: ParserCard) -> EventBase:
+        _soup = BeautifulSoup(text, "html.parser")
+        container = self._parce_container(_soup, doc.container)
+        events = self._parce_container(container, doc.card)
+
+        for event in events:
+            s = perf_counter()
+            title = event.find(doc.title.name, class_=doc.title.class_)
+
+            city = event.find(doc.city.name, class_=doc.city.class_)
+            preview_link = event.find(
+                doc.preview_link.name, class_=doc.preview_link.class_
+            )
+            page_link = event.find(doc.page_link.name, class_=doc.page_link.class_)
+
+            # print(
+            #     title.text if title else None,
+            #     "\n",
+            #     event_date.text,
+            #     city.text,
+            #     preview_link,
+            #     page_link["href"],
+            # )
+            # print(perf_counter() - s)
+            # print("===" * 20)
+        # title = self.
 
 
-class BaseParcer(ABC):
-    def __init__(self, title: str, url: str) -> None:
-        self.__session = ClientSession()
-        self.__soup = BeautifulSoup()
-        self.__events_storage = LocalStorage("Bebra")  # Fix this on real path
+# url = "https://events.yandex.ru/"
+# doc = ParserCard(
+#     host="events.yandex.ru",
+#     container=ParserCardField(name="div", class_="events__container"),
+#     card=ParserCardField(name="div", class_="event-card"),
+#     title=ParserCardField(name="a", class_="event-card__title"),
+#     date=ParserCardField(name="div", class_="event-card__date"),
+#     city=ParserCardField(name="div", class_="event-card__date"),
+#     preview_link=ParserCardField(name="div", class_="event-card__image"),
+#     page_link=ParserCardField(name="a", class_="event-card__title"),
+# )
 
-    async def get_event(self, url: str, company: str):
-        text = await self.__get_html(url, company)
-        # self.__parce_html()
-        # self.__check_event()
-        # self.__send_event_in_bot()
 
-    async def __get_html(self, url: str, company: str) -> str:
-        _headers = {"user-agent": generate_user_agent()}
-        async with self.__session.get(url, headers=_headers) as response:
-            if response.status != 200:
-                logger.error(f"Request error with <{company}> at - {url}")
-            return await response.text()
-
-    def __parce_html(self, company: str):
-        raise NotImplemented("This method must be implemented!")
+# s = perf_counter()
+# response = requests.get(url)
+# print(perf_counter() - s)
+# s = perf_counter()
+# soup = BeautifulSoup(response.content, "html.parser")
+# print(perf_counter() - s)
