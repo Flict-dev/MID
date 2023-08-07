@@ -26,4 +26,5 @@ class Sender(metaclass=Singleton):
         async with self.__session.get(url, headers=self.HEADERS) as response:
             if response.status != 200:
                 logger.error(f"Request error with <{company}> at - {url}")
+                return None
         return await response.text()
