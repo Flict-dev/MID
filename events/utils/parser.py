@@ -1,10 +1,12 @@
-from datetime import date
+# from datetime import date
+from datetime import datetime
 from logging import Logger
 from time import perf_counter
 from typing import List
 
 import dateparser
 from bs4 import BeautifulSoup, Tag
+from pydantic import UUID4
 
 from events.schemes import EventBase, ParserCard, ParserCardField
 
@@ -26,6 +28,27 @@ class SuperParser:
         "ноября",
         "декабря",
     }
+
+    def parce_event(
+        self, text: str, doc: ParserCard, company_id: UUID4
+    ) -> List[EventBase]:
+        result = []
+        _soup = BeautifulSoup(text, "html.parser")
+        container = self._parse_container(_soup, doc.container)
+        events = self._parse_events(container, doc.card)
+        for event in events:
+            title = self._parse_title(event, doc.title)
+            event_date = self._parse_date(event, doc.date)
+            if not (event_date and title) or event_date <= datetime.today():
+                continue
+            event_obj = EventBase(
+                title=title, date=event_date.date(), company_id=company_id
+            )
+            event_obj.city = self._parse_city(event, doc.city)
+            event_obj.page_link = self._parse_page_link(event, doc.page_link)
+            event_obj.preview_link = self._parse_preview_link(event, doc.preview_link)
+            result.append(event_obj)
+        return event_obj
 
     def _parse_container(self, obj: Tag, data: ParserCardField) -> List[Tag]:
         html_container = obj.find(data.name, class_=data.class_)
@@ -52,7 +75,7 @@ class SuperParser:
             return None
         return html_title.text
 
-    def _parse_city(self, obj: Tag, data: ParserCardField) -> str:
+    def _parse_city(self, obj: Tag, data: ParserCardField) -> str | None:
         html_city = obj.find(data.name, class_=data.class_)
         if not html_city:
             logger.error(
@@ -61,7 +84,7 @@ class SuperParser:
             return None
         return html_city.text
 
-    def _parse_date(self, obj: Tag, data: ParserCardField) -> date | None:
+    def _parse_date(self, obj: Tag, data: ParserCardField) -> datetime | None:
         html_date = obj.find(data.name, class_=data.class_)
         if not html_date:
             logger.error(
@@ -77,7 +100,9 @@ class SuperParser:
             return None
         return normolized_date
 
-    def _parse_preview_link(self, obj: Tag, data: ParserCardField, host: str) -> str:
+    def _parse_preview_link(
+        self, obj: Tag, data: ParserCardField, host: str
+    ) -> str | None:
         html_preview = obj.find(data.name, class_=data.class_)
         if not html_preview:
             logger.error(
@@ -115,7 +140,9 @@ class SuperParser:
                 f"Error while parsing preview_link. _parse_preview_link don't support this HTML: {html_preview}"
             )
 
-    def _parse_page_link(self, obj: Tag, data: ParserCardField, host: str) -> str:
+    def _parse_page_link(
+        self, obj: Tag, data: ParserCardField, host: str
+    ) -> str | None:
         html_link = obj.find(data.name, class_=data.class_)
         if not html_link:
             logger.error(
@@ -131,50 +158,3 @@ class SuperParser:
         if "http" not in url:
             return host + url
         return url
-
-    def parce_event(self, text: str, doc: ParserCard) -> EventBase:
-        _soup = BeautifulSoup(text, "html.parser")
-        container = self._parse_container(_soup, doc.container)
-        events = self._parse_events(container, doc.card)
-
-        # for event in events:
-        #     s = perf_counter()
-        #     title = event.find(doc.title.name, class_=doc.title.class_)
-
-        #     city = event.find(doc.city.name, class_=doc.city.class_)
-        #     preview_link = event.find(
-        #         doc.preview_link.name, class_=doc.preview_link.class_
-        #     )
-
-            # print(
-            #     title.text if title else None,
-            #     "\n",
-            #     event_date.text,
-            #     city.text,
-            #     preview_link,
-            #     page_link["href"],
-            # )
-            # print(perf_counter() - s)
-            # print("===" * 20)
-        # title = self.
-
-
-# url = "https://events.yandex.ru/"
-# doc = ParserCard(
-#     host="events.yandex.ru",
-#     container=ParserCardField(name="div", class_="events__container"),
-#     card=ParserCardField(name="div", class_="event-card"),
-#     title=ParserCardField(name="a", class_="event-card__title"),
-#     date=ParserCardField(name="div", class_="event-card__date"),
-#     city=ParserCardField(name="div", class_="event-card__date"),
-#     preview_link=ParserCardField(name="div", class_="event-card__image"),
-#     page_link=ParserCardField(name="a", class_="event-card__title"),
-# )
-
-
-# s = perf_counter()
-# response = requests.get(url)
-# print(perf_counter() - s)
-# s = perf_counter()
-# soup = BeautifulSoup(response.content, "html.parser")
-# print(perf_counter() - s)

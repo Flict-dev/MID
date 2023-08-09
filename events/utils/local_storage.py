@@ -41,27 +41,27 @@ class LocalStorage(metaclass=Singleton):
 
     async def __write_data(self, data: Dict[str, list]):
         async with aiofiles.open(self.path, "w", encoding="utf-8") as f:
-            json_object = json.dumps(data, indent=4)
-            await f.write(json_object)
+            json_event = json.dumps(data, indent=4)
+            await f.write(json_event)
 
-    def __check_object_type(self, object_type: str) -> bool:
-        if object_type not in self.__storage.keys():
-            logger.error(f"Such type as <{object_type}> doesn't exist!")
+    def __check_company_name(self, company_name: str) -> bool:
+        if company_name not in self.__storage.keys():
+            logger.error(f"Such type as <{company_name}> doesn't exist!")
             return False
         return True
 
-    async def check_object(self, object: str, object_type: str = "events") -> bool:
-        if self.__check_object_type(object_type):
-            return object in self.__storage[object_type]
+    async def check_event(self, event: str, company_name: str) -> bool:
+        if self.__check_company_name(company_name):
+            return event in self.__storage[company_name]
 
-    async def add_object(self, object: str, object_type: str = "events"):
-        if self.__check_object_type(object_type):
-            self.__storage[object_type].add(object)
+    async def add_event(self, event: str, company_name: str):
+        if self.__check_company_name(company_name):
+            self.__storage[company_name].add(event)
         data = {k: list(v) for k, v in self.__storage.items()}
         await self.__write_data(data)
 
-    async def remove_object(self, object: str, object_type: str = "events"):
-        if self.__check_object_type(object_type):
-            self.__storage[object_type].remove(object)
+    async def remove_event(self, event: str, company_name: str):
+        if self.__check_company_name(company_name):
+            self.__storage[company_name].remove(event)
         data = {k: list(v) for k, v in self.__storage.items()}
         await self.__write_data(data)
