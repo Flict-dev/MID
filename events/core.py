@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from pydantic import UUID4
 from user_agent import generate_user_agent
 
-from events.schemes import EventBase
+from events.schemas import EventBase
 from events.utils.local_storage import LocalStorage
 from events.utils.sender import Sender
 

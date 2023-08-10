@@ -8,7 +8,7 @@ import dateparser
 from bs4 import BeautifulSoup, Tag
 from pydantic import UUID4
 
-from events.schemes import EventBase, ParserCard, ParserCardField
+from events.schemas import EventBase, ParserCard, ParserCardField
 
 logger = Logger(__file__)
 
