@@ -17,6 +17,7 @@ aiofiles = "^23.1.0"
 dateparser = "^1.1.8"
 python-decouple = "^3.8"
 pydantic-settings = "^2.0.2"
+apscheduler = "^3.10.3"
 
 
 [tool.poetry.group.dev.dependencies]
