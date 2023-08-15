@@ -1,19 +1,18 @@
 # from datetime import date
 from datetime import datetime
 from logging import Logger
-from time import perf_counter
 from typing import List
 
 import dateparser
 from bs4 import BeautifulSoup, Tag
 from pydantic import UUID4
 
-from events.schemas import EventBase, ParserCard, ParserCardField
+from events.schemas import Event, ParserCard, ParserCardField
 
 logger = Logger(__file__)
 
 
-class SuperParser:
+class Parser:
     MONTHS = {
         "января",
         "феварля",
@@ -29,9 +28,9 @@ class SuperParser:
         "декабря",
     }
 
-    def parce_event(
+    def parce_events(
         self, text: str, doc: ParserCard, company_id: UUID4
-    ) -> List[EventBase]:
+    ) -> List[Event]:
         result = []
         _soup = BeautifulSoup(text, "html.parser")
         container = self._parse_container(_soup, doc.container)
@@ -41,7 +40,7 @@ class SuperParser:
             event_date = self._parse_date(event, doc.date)
             if not (event_date and title) or event_date <= datetime.today():
                 continue
-            event_obj = EventBase(
+            event_obj = Event(
                 title=title, date=event_date.date(), company_id=company_id
             )
             event_obj.city = self._parse_city(event, doc.city)

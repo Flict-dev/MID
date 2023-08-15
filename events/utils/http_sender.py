@@ -68,7 +68,7 @@ class ProxyManager:
         return proxy
 
 
-class Sender(metaclass=Singleton):
+class HTTPSender(metaclass=Singleton):
     def __init__(self) -> None:
         self.__session = ClientSession()
         self._proxy_manger = ProxyManager(self.__session)

@@ -1,15 +1,8 @@
-import json
-from abc import ABC, abstractmethod
 from logging import Logger
 from typing import Dict
 
 import aiofiles
-from aiohttp import ClientSession
-from bs4 import BeautifulSoup
-from pydantic import UUID4
-from user_agent import generate_user_agent
-
-from events.schemas import EventBase
+from msgspec import json
 
 logger = Logger(__file__)
 
@@ -25,7 +18,7 @@ class Singleton(type):
 
 class LocalStorage(metaclass=Singleton):
     """
-    Yes, I know it's better to use mongodb for storing data,
+    Yes, I know it's better to use db for storing data,
     which is used for scheduled tasks,
     but this is my project and I do whatever I want {^_^}
     """
@@ -37,11 +30,11 @@ class LocalStorage(metaclass=Singleton):
 
     async def __read_data(self) -> Dict[str, list]:
         async with aiofiles.open(self.path, "r", encoding="utf-8") as f:
-            return json.loads(await f.read())
+            return json.decode(await f.read())
 
     async def __write_data(self, data: Dict[str, list]):
         async with aiofiles.open(self.path, "w", encoding="utf-8") as f:
-            json_event = json.dumps(data, indent=4)
+            json_event = json.encode(data, indent=4)
             await f.write(json_event)
 
     def __check_company_name(self, company_name: str) -> bool:
@@ -50,7 +43,7 @@ class LocalStorage(metaclass=Singleton):
             return False
         return True
 
-    async def check_event(self, event: str, company_name: str) -> bool:
+    def check_event(self, event: str, company_name: str) -> bool:
         if self.__check_company_name(company_name):
             return event in self.__storage[company_name]
 
