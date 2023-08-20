@@ -1,15 +1,21 @@
 # from datetime import date
+import logging
 from datetime import datetime
-from logging import Logger
 from typing import List
 
 import dateparser
 from bs4 import BeautifulSoup, Tag
 from pydantic import UUID4
+from schemas import Event, ParserCard, ParserCardField
 
-from events.schemas import Event, ParserCard, ParserCardField
-
-logger = Logger(__file__)
+logging.basicConfig(
+    filename="bebra.log",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    level=logging.DEBUG,
+)
+logger = logging.getLogger(__file__)
 
 
 class Parser:
@@ -29,25 +35,34 @@ class Parser:
     }
 
     def parce_events(
-        self, text: str, doc: ParserCard, company_id: UUID4
+        self, text: str, doc: ParserCard, company_id: UUID4 = 1
     ) -> List[Event]:
         result = []
         _soup = BeautifulSoup(text, "html.parser")
         container = self._parse_container(_soup, doc.container)
         events = self._parse_events(container, doc.card)
+        print(len(events))
         for event in events:
             title = self._parse_title(event, doc.title)
             event_date = self._parse_date(event, doc.date)
-            if not (event_date and title) or event_date <= datetime.today():
+            # print(title, event_date)
+            if not (event_date and title):
                 continue
             event_obj = Event(
-                title=title, date=event_date.date(), company_id=company_id
+                title=title,
+                date=event_date.date(),
+                company_id=company_id,
+                city=self._parse_city(event, doc.city),
+                page_link=self._parse_page_link(event, doc.page_link, doc.host),
+                preview_link=self._parse_preview_link(
+                    event, doc.preview_link, doc.host
+                ),
             )
-            event_obj.city = self._parse_city(event, doc.city)
-            event_obj.page_link = self._parse_page_link(event, doc.page_link)
-            event_obj.preview_link = self._parse_preview_link(event, doc.preview_link)
+            # print('*****************************')
+            # print(event_obj)
             result.append(event_obj)
-        return event_obj
+        # print(result)
+        return result
 
     def _parse_container(self, obj: Tag, data: ParserCardField) -> List[Tag]:
         html_container = obj.find(data.name, class_=data.class_)
@@ -59,6 +74,7 @@ class Parser:
 
     def _parse_events(self, obj: Tag, data: ParserCardField) -> List[Tag]:
         events = obj.find_all(data.name, class_=data.class_)
+        print(len(events))
         if not events:
             logger.error(
                 f"Error while parsing events. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
@@ -91,7 +107,8 @@ class Parser:
             )
             return None
         strings = html_date.text.split(" ")
-        string_date = map(lambda x: x.isdigit() or x in self.MONTHS, strings)
+
+        string_date = [x for x in strings if x.isdigit() or x in self.MONTHS]
         normolized_date = dateparser.parse(" ".join(string_date))
 
         if not normolized_date:

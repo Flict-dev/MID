@@ -1,0 +1,46 @@
+[
+  {
+    "url": "https://events.yandex.ru/",
+    "host": "https://digital.alfabank.ru",
+    "container": { "name": "div", "class_": "events__container" },
+    "card": { "name": "div", "class_": "event-card" },
+    "title": { "name": "a", "class_": "event-card__title" },
+    "date": { "name": "div", "class_": "event-card__date" },
+    "city": { "name": "div", "class_": "card__date" },
+    "preview_link": { "name": "div", "class_": "event-card__image" },
+    "page_link": { "name": "a", "class_": "event-card__title" }
+  },
+  {
+    "url": "https://digital.alfabank.ru/events",
+    "host": "https://digital.alfabank.ru",
+    "container": { "name": "div", "class_": "b__wrapper" },
+    "card": { "name": "a", "class_": "item-preview_component__8zfTJ items_listItem__2KVH6" },
+    "title": { "name": "div", "class_": "item-preview_title__2X_or" },
+    "date": { "name": "div", "class_": "item-preview_date__nz2jq" },
+    "city": { "name": "div", "class_": "item-preview_additionalDescription__1fCxX" },
+    "preview_link": { "name": "div", "class_": "item-preview_image__icSRW" },
+    "page_link": { "name": "a", "class_": "item-preview_component__8zfTJ items_listItem__2KVH6" }
+  },
+  {
+    "url": "https://vk.company/ru/press/events/",
+    "host": "https://vk.company/ru",
+    "container": { "name": "div", "class_": "Publications_publicationsMain__wN0FV Publications_publicationsList__LsLm9" },
+    "card": { "name": "div", "class_": "Publications_publicationItem__ICFNd AnimatedBlock_animatedBlock__OTNDA AnimatedBlock_animatedBlock_wasVisible__JDmX1" },
+    "title": { "name": "div", "class_": "Publications_publicationTitle__oKOtT" },
+    "date": { "name": "div", "class_": "Publications_publicationSubtitle__e297T" },
+    "city": { "name": "", "class_": "" },
+    "preview_link": { "name": "div", "class_": "Publications_publicationImage__bI10M" },
+    "page_link": { "name": "a", "class_": "Publications_publication__Ehhcu Publications_publication_large__rTopM Publications_publication_smallTitle__z4Kpk" }
+  },
+  {
+    "url": "https://avito.tech/events/",
+    "host": "",
+    "container": { "name": "ul", "class_": "js-feed-container t-feed__container t897__container t-feed__container_mobile-grid" },
+    "card": { "name": "div", "class_": "js-feed-post t-feed__post" },
+    "title": { "name": "a", "class_": "t-feed__link js-feed-post-link" },
+    "date": { "name": "span", "class_": "js-feed-post-date t-feed__post-date t-uptitle t-uptitle_xs" },
+    "city": { "name": "a", "class_": "a" },
+    "preview_link": { "name": "div", "class_": "t-feed__post-bgimg t-bgimg" },
+    "page_link": { "name": "a", "class_": "t-feed__link js-feed-post-link" }
+  }
+]

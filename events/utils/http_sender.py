@@ -21,12 +21,18 @@ class Singleton(type):
 class ProxyManager:
     def __init__(self, session: ClientSession) -> None:
         self.__session = session
-        self._proxy_provider = "https://free-proxy-list.net/"
+        self._proxy_provider = "https://free-proxy-list.net"
 
     async def _get_proxies(self) -> List[str]:
         result = []
-        async with self.__session.get(self._proxy_provider) as response:
+        print('=======' * 10)
+
+        headers = generate_navigator(os=("win", "mac"))
+        headers = {k: v for k, v in headers.items() if v}
+        async with self.__session.get(self._proxy_provider, headers=headers) as response:
+            print('=======' * 10)
             if response.status != 200:
+                
                 logger.critical(
                     f"Free proxy website sent invalid status code {response.status}"
                 )
@@ -40,7 +46,7 @@ class ProxyManager:
             )
             return result
         table_body = proxy_table.find("tbody")
-        for row in table_body.find_all("tr")[10:]:
+        for row in table_body.find_all("tr")[5:]:
             columns = row.find_all("td")
             ip = columns[0].text
             port = columns[1].text
@@ -59,12 +65,12 @@ class ProxyManager:
             return None
 
         proxy = choice(proxy_list)
-        while not self._check_proxy(proxy):
-            proxy_list.remove(proxy)
-            if len(proxy_list) == 0:
-                logger.error("Proxy list not found!")
-                return None
-            proxy = choice(proxy_list)
+        # while not await self._check_proxy(proxy):
+        #     proxy_list.remove(proxy)
+        #     if len(proxy_list) == 0:
+        #         logger.error("Proxy list not found!")
+        #         return None
+        #     proxy = choice(proxy_list)
         return proxy
 
 
@@ -76,8 +82,12 @@ class HTTPSender(metaclass=Singleton):
     async def get_html(self, url: str, company: str) -> str | None:
         proxy = await self._proxy_manger.get_proxy()
         headers = generate_navigator(os=("win", "mac"))
-        async with self.__session.get(url, headers=headers, proxy=proxy) as response:
+        headers = {k: v for k, v in headers.items() if v}
+        async with self.__session.get(url, headers=headers) as response:
             if response.status != 200:
                 logger.error(f"Request error with <{company}> at - {url}")
                 return None
-        return await response.text()
+            return await response.text()
+
+    async def close(self):
+        await self.__session.close()
