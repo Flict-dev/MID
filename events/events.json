@@ -1,46 +1,92 @@
 [
   {
     "url": "https://events.yandex.ru/",
-    "host": "https://digital.alfabank.ru",
-    "container": { "name": "div", "class_": "events__container" },
-    "card": { "name": "div", "class_": "event-card" },
-    "title": { "name": "a", "class_": "event-card__title" },
-    "date": { "name": "div", "class_": "event-card__date" },
-    "city": { "name": "div", "class_": "card__date" },
-    "preview_link": { "name": "div", "class_": "event-card__image" },
-    "page_link": { "name": "a", "class_": "event-card__title" }
+    "host": "https://events.yandex.ru",
+    "events": "//*[@id='mount']/div[2]/div/div[2]/div/div",
+    "title": "//*[@id='mount']/div[2]/div/div[2]/div/div[{index}]/div/a",
+    "date": "//*[@id='mount']/div[2]/div/div[2]/div/div[{index}]/div/div[1]",
+    "city": "",
+    "preview_link": "//*[@id='mount']/div[2]/div/div[2]/div/div[{index}]/a/div",
+    "page_link": "//*[@id='mount']/div[2]/div/div[2]/div/div[{index}]/a"
   },
   {
     "url": "https://digital.alfabank.ru/events",
     "host": "https://digital.alfabank.ru",
-    "container": { "name": "div", "class_": "b__wrapper" },
-    "card": { "name": "a", "class_": "item-preview_component__8zfTJ items_listItem__2KVH6" },
-    "title": { "name": "div", "class_": "item-preview_title__2X_or" },
-    "date": { "name": "div", "class_": "item-preview_date__nz2jq" },
-    "city": { "name": "div", "class_": "item-preview_additionalDescription__1fCxX" },
-    "preview_link": { "name": "div", "class_": "item-preview_image__icSRW" },
-    "page_link": { "name": "a", "class_": "item-preview_component__8zfTJ items_listItem__2KVH6" }
+    "events": "//*[@id='__next']/div/div[2]/div[3]/div/a",
+    "title": "//*[@id='__next']/div/div[2]/div[3]/div/a[{index}]/div[2]/div[2]",
+    "date": "//*[@id='__next']/div/div[2]/div[3]/div/a[{index}]/div[2]/div[1]",
+    "city": "//*[@id='__next']/div/div[2]/div[3]/div/a[{index}]/div[2]/div[3]/div[2]/div/div",
+    "preview_link": "//*[@id='__next']/div/div[2]/div[3]/div/a[{index}]/div[1]",
+    "page_link": "//*[@id='__next']/div/div[2]/div[3]/div/a[{index}]"
   },
   {
     "url": "https://vk.company/ru/press/events/",
-    "host": "https://vk.company/ru",
-    "container": { "name": "div", "class_": "Publications_publicationsMain__wN0FV Publications_publicationsList__LsLm9" },
-    "card": { "name": "div", "class_": "Publications_publicationItem__ICFNd AnimatedBlock_animatedBlock__OTNDA AnimatedBlock_animatedBlock_wasVisible__JDmX1" },
-    "title": { "name": "div", "class_": "Publications_publicationTitle__oKOtT" },
-    "date": { "name": "div", "class_": "Publications_publicationSubtitle__e297T" },
-    "city": { "name": "", "class_": "" },
-    "preview_link": { "name": "div", "class_": "Publications_publicationImage__bI10M" },
-    "page_link": { "name": "a", "class_": "Publications_publication__Ehhcu Publications_publication_large__rTopM Publications_publication_smallTitle__z4Kpk" }
+    "host": "https://vk.company",
+    "events": "//*[@id='main']/div/div[2]/div[1]/div[1]/div",
+    "title": "//*[@id='main']/div/div[2]/div[1]/div[1]/div[{index}]/a/div[2]/div[1]/div[2]",
+    "date": "//*[@id='main']/div/div[2]/div[1]/div[1]/div[{index}]/a/div[2]/div[1]/div[1]",
+    "city": "",
+    "preview_link": "//*[@id='main']/div/div[2]/div[1]/div[1]/div[{index}]/a/div[1]/img",
+    "page_link": "//*[@id='main']/div/div[2]/div[1]/div[1]/div[{index}]/a"
   },
   {
-    "url": "https://avito.tech/events/",
+    "url": "https://ozontech.timepad.ru/events/",
     "host": "",
-    "container": { "name": "ul", "class_": "js-feed-container t-feed__container t897__container t-feed__container_mobile-grid" },
-    "card": { "name": "div", "class_": "js-feed-post t-feed__post" },
-    "title": { "name": "a", "class_": "t-feed__link js-feed-post-link" },
-    "date": { "name": "span", "class_": "js-feed-post-date t-feed__post-date t-uptitle t-uptitle_xs" },
-    "city": { "name": "a", "class_": "a" },
-    "preview_link": { "name": "div", "class_": "t-feed__post-bgimg t-bgimg" },
-    "page_link": { "name": "a", "class_": "t-feed__link js-feed-post-link" }
+    "events": "//*[@id='content']/div[2]/div/div",
+    "title": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a",
+    "date": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[2]",
+    "city": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[1]",
+    "preview_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]",
+    "page_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a"
+  },
+  {
+    "url": "https://sbermarket.timepad.ru/events/",
+    "host": "",
+    "events": "//*[@id='content']/div[2]/div/div",
+    "title": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a",
+    "date": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[2]",
+    "city": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[1]",
+    "preview_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]",
+    "page_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a"
+  },
+  {
+    "url": "https://avito.tech/events/#!/tfeeds/824866575188/c/Митапы",
+    "host": "",
+    "events": "//*[@id='rec222178530']/div/div/ul/div",
+    "title": "//*[@id='rec222178530']/div/div/ul/div[{index}]/div/div[2]/div[2]/div[1]/a",
+    "date": "//*[@id='rec222178530']/div/div/ul/div[{index}]/div/div[2]/div[1]/span",
+    "city": "",
+    "preview_link": "//*[@id='rec222178530']/div/div/ul/div[{index}]/div/div[1]/div",
+    "page_link": "//*[@id='rec222178530']/div/div/ul/div[{index}]/div/div[2]/div[2]/div[1]/a"
+  },
+  {
+    "url": "https://moscowdjango.timepad.ru/events/",
+    "host": "",
+    "events": "//*[@id='content']/div[2]/div/div",
+    "title": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a",
+    "date": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[2]",
+    "city": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[1]",
+    "preview_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]",
+    "page_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a"
+  },
+  {
+    "url": "https://founders-mondays.timepad.ru/events/",
+    "host": "",
+    "events": "//*[@id='content']/div[2]/div/div",
+    "title": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a",
+    "date": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[2]",
+    "city": "//*[@id='content']/div[2]/div/div[{index}]/div[2]/p[1]/span[1]",
+    "preview_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]",
+    "page_link": "//*[@id='content']/div[2]/div/div[{index}]/div[1]/div[2]/h3/a"
+  },
+  {
+    "url": "https://meetup.tinkoff.ru/",
+    "host": "https://meetup.tinkoff.ru",
+    "events": "/html/body/div[1]/div/div[4]/div/div[1]/div",
+    "title": "/html/body/div[1]/div/div[4]/div/div[1]/div[{index}]/div/div/a/span/div/div[2]/h4",
+    "date": "/html/body/div[1]/div/div[4]/div/div[1]/div[{index}]/div/div/a/span/div/div[2]/span[1]",
+    "city": "/html/body/div[1]/div/div[4]/div/div[1]/div[{index}]/div/div/a/span/div/div[2]/span[2]",
+    "preview_link": "/html/body/div[1]/div/div[4]/div/div[1]/div[{index}]/div/div/a/span/div/div[1]/img",
+    "page_link": "/html/body/div[1]/div/div[4]/div/div[1]/div[{index}]/div/div/a"
   }
 ]

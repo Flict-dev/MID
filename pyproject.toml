@@ -20,6 +20,7 @@ pydantic-settings = "^2.0.2"
 apscheduler = "^3.10.3"
 aio-pika = "^9.2.2"
 msgspec = "^0.18.0"
+lxml = "^4.9.3"
 
 
 [tool.poetry.group.dev.dependencies]

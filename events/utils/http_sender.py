@@ -25,14 +25,15 @@ class ProxyManager:
 
     async def _get_proxies(self) -> List[str]:
         result = []
-        print('=======' * 10)
+        print("=======" * 10)
 
         headers = generate_navigator(os=("win", "mac"))
         headers = {k: v for k, v in headers.items() if v}
-        async with self.__session.get(self._proxy_provider, headers=headers) as response:
-            print('=======' * 10)
+        async with self.__session.get(
+            self._proxy_provider, headers=headers
+        ) as response:
+            print("=======" * 10)
             if response.status != 200:
-                
                 logger.critical(
                     f"Free proxy website sent invalid status code {response.status}"
                 )

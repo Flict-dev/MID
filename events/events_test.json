@@ -1,7 +1,0 @@
-[
-    {
-      "url": "https://events.yandex.ru/",
-      "container": { "name": "div", "class_": "events__container" },
-      "card": { "name": "div", "class_": "event-card" }
-    }
-]

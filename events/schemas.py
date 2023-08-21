@@ -20,22 +20,18 @@ class Event(Struct):
         res = []
         for f in self.__struct_fields__:
             res.append(f"{f}: {getattr(self, f)}\n")
-        return ''.join(res)
-class ParserCardField(Struct):
-    name: str | None
-    class_: str | None
+        return "".join(res)
 
 
 class ParserCard(Struct):
     url: str | None
     host: str | None
-    container: ParserCardField
-    card: ParserCardField
-    title: ParserCardField
-    date: ParserCardField
-    city: ParserCardField
-    preview_link: ParserCardField
-    page_link: ParserCardField
+    events: str | None
+    title: str
+    date: str
+    city: str | None
+    preview_link: str | None
+    page_link: str | None
 
 
 class ParserBase(Struct):

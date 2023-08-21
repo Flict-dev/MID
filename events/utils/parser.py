@@ -1,176 +1,118 @@
-# from datetime import date
 import logging
 from datetime import datetime
+from io import StringIO
+from time import time
 from typing import List
 
 import dateparser
-from bs4 import BeautifulSoup, Tag
+from lxml import etree
+from lxml.etree import _Element
 from pydantic import UUID4
-from schemas import Event, ParserCard, ParserCardField
+from schemas import Event, ParserCard
 
-logging.basicConfig(
-    filename="bebra.log",
-    filemode="a",
-    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-    datefmt="%H:%M:%S",
-    level=logging.DEBUG,
-)
 logger = logging.getLogger(__file__)
 
 
 class Parser:
-    MONTHS = {
-        "января",
-        "феварля",
-        "марта",
-        "апреля",
-        "мая",
-        "июня",
-        "июля",
-        "августа",
-        "сентярбря",
-        "октября",
-        "ноября",
-        "декабря",
-    }
+    def __init__(self) -> None:
+        self.__html_parser = etree.HTMLParser()
 
     def parce_events(
-        self, text: str, doc: ParserCard, company_id: UUID4 = 1
+        self, text: str, doc: ParserCard, company_id: UUID4 = 1  # FIX tihs
     ) -> List[Event]:
         result = []
-        _soup = BeautifulSoup(text, "html.parser")
-        container = self._parse_container(_soup, doc.container)
-        events = self._parse_events(container, doc.card)
-        print(len(events))
-        for event in events:
-            title = self._parse_title(event, doc.title)
-            event_date = self._parse_date(event, doc.date)
-            # print(title, event_date)
-            if not (event_date and title):
+        tree = etree.parse(StringIO(text), self.__html_parser)
+        events = self._parse_events(tree, doc.events)
+        if events is None:
+            return result
+        for i in range(1, len(events)):
+            title = self._parse_title(tree, doc.title.format(index=i))
+            event_date = self._parse_date(tree, doc.date.format(index=i))
+            if not (event_date and title) or event_date.timestamp() < time():
                 continue
-            event_obj = Event(
-                title=title,
-                date=event_date.date(),
-                company_id=company_id,
-                city=self._parse_city(event, doc.city),
-                page_link=self._parse_page_link(event, doc.page_link, doc.host),
-                preview_link=self._parse_preview_link(
-                    event, doc.preview_link, doc.host
-                ),
+            result.append(
+                Event(
+                    title=title.strip(),
+                    date=event_date,
+                    company_id=company_id,
+                    city=self._parse_city(tree, doc.city.format(index=i)),
+                    page_link=self._parse_page_link(
+                        tree, doc.page_link.format(index=i), doc.host
+                    ),
+                    preview_link=self._parse_preview_link(
+                        tree, doc.preview_link.format(index=i), doc.host
+                    ),
+                )
             )
-            # print('*****************************')
-            # print(event_obj)
-            result.append(event_obj)
-        # print(result)
         return result
 
-    def _parse_container(self, obj: Tag, data: ParserCardField) -> List[Tag]:
-        html_container = obj.find(data.name, class_=data.class_)
-        if not html_container:
-            logger.error(
-                f"Error while parsing container. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-        return html_container
+    def __find_by_xpath(
+        self, tree, path: str, element: str, is_single: bool = True
+    ) -> List[_Element] | _Element | None:
+        if not path:
+            logger.error(f"Error while parsing {element}.\n XPATH: {path}")
+            return None
+        objects: List[_Element] = tree.xpath(path)
+        if not objects:
+            logger.error(f"Error while parsing {element}.\n XPATH: {path}")
+            return None
+        return objects[0] if is_single else objects
 
-    def _parse_events(self, obj: Tag, data: ParserCardField) -> List[Tag]:
-        events = obj.find_all(data.name, class_=data.class_)
-        print(len(events))
-        if not events:
-            logger.error(
-                f"Error while parsing events. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
+    def _parse_events(self, tree, events_path: str) -> List[_Element] | None:
+        events = self.__find_by_xpath(tree, events_path, "events", False)
         return events
 
-    def _parse_title(self, obj: Tag, data: ParserCardField) -> str | None:
-        html_title = obj.find(data.name, class_=data.class_)
-        if not html_title:
-            logger.error(
-                f"Error while parsing title. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-            return None
-        return html_title.text
+    def _parse_title(self, tree, title_path: str) -> str | None:
+        title = self.__find_by_xpath(tree, title_path, "title")
+        return title.text if title is not None else None
 
-    def _parse_city(self, obj: Tag, data: ParserCardField) -> str | None:
-        html_city = obj.find(data.name, class_=data.class_)
-        if not html_city:
-            logger.error(
-                f"Error while parsing city. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-            return None
-        return html_city.text
+    def _parse_city(self, tree, city_path: str) -> str | None:
+        city = self.__find_by_xpath(tree, city_path, "city")
+        return city.text if city is not None else None
 
-    def _parse_date(self, obj: Tag, data: ParserCardField) -> datetime | None:
-        html_date = obj.find(data.name, class_=data.class_)
-        if not html_date:
-            logger.error(
-                f"Error while parsing date. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-            return None
-        strings = html_date.text.split(" ")
+    def _parse_date(self, tree, date_path: str) -> datetime | None:
+        date = self.__find_by_xpath(tree, date_path, "date")
+        if date is not None and date.text is not None:
+            return dateparser.parse(date.text)
+        return None
 
-        string_date = [x for x in strings if x.isdigit() or x in self.MONTHS]
-        normolized_date = dateparser.parse(" ".join(string_date))
+    def _parse_preview_link(self, tree, preview_path: str, host: str) -> str | None:
+        preview = self.__find_by_xpath(tree, preview_path, "preview")
 
-        if not normolized_date:
-            logger.error(f"Error while date parsing!\nText: {string_date}")
-            return None
-        return normolized_date
-
-    def _parse_preview_link(
-        self, obj: Tag, data: ParserCardField, host: str
-    ) -> str | None:
-        html_preview = obj.find(data.name, class_=data.class_)
-        if not html_preview:
-            logger.error(
-                f"Error while parsing preview_link. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-            return None
-
-        def __parse_from_div(elemnt: Tag):
+        def _parse_from_div(elemnt: _Element):
             string_style = elemnt.get("style")
-            url = string_style.replace(")", "").replace("background-image:url(", "")
+            url = (
+                string_style.replace(")", "")
+                .replace("background-image:", "")
+                .replace("url(", "")
+                .strip()
+            )
             if not url:
-                logger.error(
-                    f"Error while parsing preview_link. Field '{data.name}' with class name '{data.class_}' not found in HTML: {html_preview}"
-                )
+                logger.error(f"Error _parse_from_div url dont found!")
                 return None
-            if "http" in url:
-                return url
-            return host + url
+            return host + url if "http" not in url else url
 
-        def __parse_from_img(elemnt: Tag):
+        def _parse_from_img(elemnt: _Element):
             url = elemnt.get("src")
             if not url:
-                logger.error(
-                    f"Error while parsing preview_link. Field '{data.name}' with class name '{data.class_}' not found in HTML: {html_preview}"
-                )
+                logger.error(f"Error _parse_from_img url dont found!")
                 return None
-            return url
+            return host + url if "http" not in url else url
 
-        if html_preview.name == "div":
-            return __parse_from_div(html_preview)
-        elif html_preview.name == "img":
-            return __parse_from_img(html_preview)
-        else:
-            logger.error(
-                f"Error while parsing preview_link. _parse_preview_link don't support this HTML: {html_preview}"
-            )
+        if preview is not None:
+            if preview.tag == "div":
+                return _parse_from_div(preview)
+            elif preview.tag == "img":
+                return _parse_from_img(preview)
+            else:
+                logger.error(
+                    f"Error _parse_preview_link don't support this HTML: {preview.tag}"
+                )
+        return None
 
-    def _parse_page_link(
-        self, obj: Tag, data: ParserCardField, host: str
-    ) -> str | None:
-        html_link = obj.find(data.name, class_=data.class_)
-        if not html_link:
-            logger.error(
-                f"Error while parsing page_link. Field '{data.name}' with class name '{data.class_}' not found in HTML: {obj}"
-            )
-            return None
-        url = html_link.get("href")
-        if not url:
-            logger.error(
-                f"Error while parsing page_link. Href not found in HTML: {html_link}"
-            )
-            return None
-        if "http" not in url:
-            return host + url
-        return url
+    def _parse_page_link(self, tree, link_path: str, host: str) -> str | None:
+        link = self.__find_by_xpath(tree, link_path, "link")
+        if link is not None:
+            url = link.get("href")
+            return host + url if "http" not in url else url
+        return None
