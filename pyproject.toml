@@ -17,10 +17,11 @@ aiofiles = "^23.1.0"
 dateparser = "^1.1.8"
 python-decouple = "^3.8"
 pydantic-settings = "^2.0.2"
-apscheduler = "^3.10.3"
 aio-pika = "^9.2.2"
 msgspec = "^0.18.0"
 lxml = "^4.9.3"
+sqlalchemy = "^2.0.20"
+apscheduler = "^3.10.4"
 
 
 [tool.poetry.group.dev.dependencies]
