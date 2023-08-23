@@ -1,36 +1,52 @@
+import asyncio
 from logging import Logger
 from uuid import UUID
 
-from aio_pika import Connection
-
-from events.schemas import ParserCard
-from events.settings import get_settings
-from events.utils.http_sender import HTTPSender
-from events.utils.local_storage import LocalStorage
-from events.utils.parser import Parser
-from events.utils.rmq_sender import RMQSender
+from aio_pika import Connection, connect_robust
+from schemas import Company
+from settings import get_settings
+from utils.http_sender import HTTPSender
+from utils.local_storage import LocalStorage
+from utils.parser import Parser
+from utils.rmq_sender import RMQSender
 
 settings = get_settings()
 logger = Logger(__file__)
 
 
 class EventsManager:
-    def __init__(self, ls_path: str, rmq_connection: Connection) -> None:
-        self.events_storage = LocalStorage(ls_path)
-        self.http_sender = HTTPSender()
-        self.parser = Parser()
-        self.rmq_sender = RMQSender(rmq_connection)
+    async def __aenter__(self):
+        self._events_storage = LocalStorage(settings.ls_path)
+        # self.__rmq_connection = await connect_robust(settings.rmq_dsn)
+        self._http_sender = HTTPSender()
+        # self._parser = Parser()
+        # self._rmq_sender = RMQSender(self.__rmq_connection)
+        return self
 
-    async def task(
-        self,
-        url: str,
-        company: str,
-        doc: ParserCard,
-        company_id: UUID,
-    ):
-        html = await self.http_sender.get_html(url, company)
-        events = self.parser.parce_events(html, doc, company_id)
+    async def __aexit__(self, exc_type, exc, tb):
+        await self._http_sender.close()
+        # await self.__rmq_connection.close()
+        # await self._events_storage._write_data()
+
+    async def _check_company(self, doc: Company):
+        html = await self._http_sender.get_html(doc.url, doc.title)
+        events = self._parser.parse_events(html, doc)
+        # TODO: write logic for remove event from LS
         for event in events:
-            if self.events_storage.check_event(event.title, company):
-                await self.events_storage.add_event(event.title, company)
-                await self.rmq_sender.send_event(event)
+            if await self._events_storage.check_event(event.title, doc.title):
+                await self._events_storage.add_event(event.title, doc.title)
+                await self._rmq_sender.send_event(event)
+
+    async def check_events(self):
+        
+        await asyncio.sleep(0.5)
+        print('Event!')
+        # companies = await self._http_sender.get_companies(settings.db_api)
+        # if companies is None:
+        #     # Write allert logic here
+        #     return
+        # tasks = []
+        # for company in companies:
+        #     task = self._check_company(company)
+        #     tasks.append(task)
+        # await asyncio.gather(*tasks)

@@ -1,7 +1,7 @@
 from datetime import date
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from msgspec import Struct, field, json
+from msgspec import Struct, json
 
 
 class Event(Struct):
@@ -11,7 +11,6 @@ class Event(Struct):
     preview_link: str | None
     page_link: str | None
     company_id: UUID
-    id: UUID = field(default_factory=uuid4)
 
     def to_bytes(self) -> bytes:
         return json.encode({f: getattr(self, f) for f in self.__struct_fields__})
@@ -23,17 +22,21 @@ class Event(Struct):
         return "".join(res)
 
 
-class ParserCard(Struct):
+class CompanyCard(Struct):
+    title: str
+    date: str
     url: str | None
     host: str | None
     events: str | None
-    title: str
-    date: str
     city: str | None
     preview_link: str | None
     page_link: str | None
 
 
-class ParserBase(Struct):
-    struct: ParserCard
-    events: list
+class Company(Struct):
+    id: UUID
+    title: str
+    url: str
+    host: str
+    parse_struct: CompanyCard
+    is_active: bool

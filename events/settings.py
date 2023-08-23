@@ -6,11 +6,11 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    token = config("TOKEN")
-    pg_dsn = PostgresDsn("postgres://user:pass@localhost:5432/foobar")
-    ls_path = ""
-    rmq_dsn = ""
-    routing_key = config("ROUTING_KEY")
+    # token = config("TOKEN")
+    ls_path: str = "a"
+    rmq_dsn: str= "a"
+    # routing_key = config("ROUTING_KEY")
+    db_api: str = "a"
 
 
 @lru_cache()

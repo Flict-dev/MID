@@ -1,40 +1,20 @@
-# import asyncio
+import asyncio
 
-# from aio_pika import connect_robust
-# from core import EventsManager
+from core import EventsManager
+from settings import get_settings
 
-# from events.settings import get_settings
-
-# settings = get_settings()
-
-
-# async def on_startup():
-#     ...
-
-
-# async def get_all_companies():
-#     ...
-
-
-# async def main():
-#     connection = await connect_robust(settings.rmq_dsn)
-#     manager = EventsManager(settings.ls_path, connection)
-#     manager.task()
-
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
+settings = get_settings()
 
 
 import asyncio
 import logging
-from typing import List
 
-from msgspec import Struct, json
-from schemas import ParserCard
-from utils.http_sender import HTTPSender
-from utils.parser import Parser
+# from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+# from sqlalchemy.ext.asyncio import create_async_engine
+
+# from apscheduler.triggers.interval import IntervalTrigger
 logging.basicConfig(
     filename="main.log",
     filemode="a",
@@ -45,21 +25,20 @@ logging.basicConfig(
 
 
 async def main():
-    bebra = HTTPSender()
-    parser = Parser()
+    scheduler = AsyncIOScheduler()
 
-    with open("events.json", encoding="utf-8") as f:
-        data = json.decode(f.read(), type=List[ParserCard])
+    async with EventsManager() as manager:
+        scheduler.add_job(manager.check_events, 'interval', seconds=3)
+    scheduler.start()
+    await asyncio.Event().wait()
 
-    try:
-        for event in data:
-            html = await bebra.get_html(event.url, "yandex")
-            events = parser.parce_events(html, event)
-            for i in events:
-                print(i)
-                print("====" * 15)
-    finally:
-        await bebra.close()
+if __name__ == "__main__":
+    
+    asyncio.run(main())
+    # asyncio.get_event_loop().run_forever()
+
+
+
 
 
 if __name__ == "__main__":

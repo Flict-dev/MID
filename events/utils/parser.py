@@ -8,7 +8,7 @@ import dateparser
 from lxml import etree
 from lxml.etree import _Element
 from pydantic import UUID4
-from schemas import Event, ParserCard
+from schemas import Company, Event
 
 logger = logging.getLogger(__file__)
 
@@ -17,30 +17,28 @@ class Parser:
     def __init__(self) -> None:
         self.__html_parser = etree.HTMLParser()
 
-    def parce_events(
-        self, text: str, doc: ParserCard, company_id: UUID4 = 1  # FIX tihs
-    ) -> List[Event]:
+    def parse_events(self, text: str, doc: Company) -> List[Event]:
         result = []
         tree = etree.parse(StringIO(text), self.__html_parser)
-        events = self._parse_events(tree, doc.events)
+        events = self._parse_events(tree, doc.parse_struct.events)
         if events is None:
             return result
         for i in range(1, len(events)):
             title = self._parse_title(tree, doc.title.format(index=i))
-            event_date = self._parse_date(tree, doc.date.format(index=i))
+            event_date = self._parse_date(tree, doc.parse_struct.date.format(index=i))
             if not (event_date and title) or event_date.timestamp() < time():
                 continue
             result.append(
                 Event(
                     title=title.strip(),
                     date=event_date,
-                    company_id=company_id,
-                    city=self._parse_city(tree, doc.city.format(index=i)),
+                    company_id=doc.id,
+                    city=self._parse_city(tree, doc.parse_struct.city.format(index=i)),
                     page_link=self._parse_page_link(
-                        tree, doc.page_link.format(index=i), doc.host
+                        tree, doc.parse_struct.page_link.format(index=i), doc.host
                     ),
                     preview_link=self._parse_preview_link(
-                        tree, doc.preview_link.format(index=i), doc.host
+                        tree, doc.parse_struct.preview_link.format(index=i), doc.host
                     ),
                 )
             )
