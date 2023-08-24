@@ -8,10 +8,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiogram = "^3.0.0b9"
+aiohttp = "^3.8.5"
 asyncpg = "^0.28.0"
 beautifulsoup4 = "^4.12.2"
-pydantic = "^2.1.1"
 user-agent = "^0.1.10"
 aiofiles = "^23.1.0"
 dateparser = "^1.1.8"

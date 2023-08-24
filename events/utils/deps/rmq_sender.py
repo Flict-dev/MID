@@ -1,7 +1,8 @@
 from aio_pika import Connection
 from aio_pika.message import Message
-from schemas import Event
-from settings import get_settings
+
+from events.api.schema import Event
+from events.settings import get_settings
 
 settings = get_settings()
 

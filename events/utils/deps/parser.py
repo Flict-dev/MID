@@ -8,7 +8,8 @@ import dateparser
 from lxml import etree
 from lxml.etree import _Element
 from pydantic import UUID4
-from schemas import Company, Event
+
+from events.api.schema import Company, Event
 
 logger = logging.getLogger(__file__)
 

@@ -2,8 +2,9 @@ import asyncio
 import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from core import EventsManager
-from settings import get_settings
+
+from events.settings import get_settings
+from events.utils.manager import EventsManager
 
 settings = get_settings()
 

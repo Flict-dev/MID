@@ -3,12 +3,13 @@ from logging import Logger
 from uuid import UUID
 
 from aio_pika import Connection, connect_robust
-from schemas import Company
-from settings import get_settings
-from utils.http_sender import HTTPSender
-from utils.local_storage import LocalStorage
-from utils.parser import Parser
-from utils.rmq_sender import RMQSender
+
+from events.api.schema import Company
+from events.settings import get_settings
+from events.utils.deps.http_sender import HTTPSender
+from events.utils.deps.local_storage import LocalStorage
+from events.utils.deps.parser import Parser
+from events.utils.deps.rmq_sender import RMQSender
 
 settings = get_settings()
 logger = Logger(__file__)
@@ -32,10 +33,10 @@ class EventsManager:
         html = await self._http_sender.get_html(doc.url, doc.title)
         events = self._parser.parse_events(html, doc)
         # TODO: write logic for remove event from LS
-        
+
         for event in events:
             print(event)
-            print('===')
+            print("===")
             # if await self._events_storage.check_event(event.title, doc.title):
             #     await self._events_storage.add_event(event.title, doc.title)
             #     await self._rmq_sender.send_event(event)

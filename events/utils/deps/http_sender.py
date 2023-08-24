@@ -3,8 +3,9 @@ from typing import List
 
 from aiohttp import ClientSession
 from msgspec import json
-from schemas import Company
 from user_agent import generate_navigator
+
+from events.api.schema import Company
 
 logger = Logger(__file__)
 
@@ -30,14 +31,6 @@ class HTTPSender(metaclass=Singleton):
                 logger.error(f"Request error with <{company}> at - {url}")
                 return None
             return await response.text()
-
-    async def get_companies(self, url: str) -> List[Company]:
-        async with self.__session.get(url) as response:
-            if response.status != 200:
-                logger.error("DB service send error!")
-                return None
-            json = await response.json()
-            return json.decode(json, type=List[Company])
 
     async def close(self):
         await self.__session.close()
