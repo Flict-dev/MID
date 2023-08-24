@@ -19,7 +19,7 @@ class EventsManager:
         self._events_storage = LocalStorage(settings.ls_path)
         # self.__rmq_connection = await connect_robust(settings.rmq_dsn)
         self._http_sender = HTTPSender()
-        # self._parser = Parser()
+        self._parser = Parser()
         # self._rmq_sender = RMQSender(self.__rmq_connection)
         return self
 
@@ -32,15 +32,16 @@ class EventsManager:
         html = await self._http_sender.get_html(doc.url, doc.title)
         events = self._parser.parse_events(html, doc)
         # TODO: write logic for remove event from LS
+        
         for event in events:
-            if await self._events_storage.check_event(event.title, doc.title):
-                await self._events_storage.add_event(event.title, doc.title)
-                await self._rmq_sender.send_event(event)
+            print(event)
+            print('===')
+            # if await self._events_storage.check_event(event.title, doc.title):
+            #     await self._events_storage.add_event(event.title, doc.title)
+            #     await self._rmq_sender.send_event(event)
 
     async def check_events(self):
-        
-        await asyncio.sleep(0.5)
-        print('Event!')
+        ...
         # companies = await self._http_sender.get_companies(settings.db_api)
         # if companies is None:
         #     # Write allert logic here
