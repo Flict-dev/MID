@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mid"
-version = "0.1.0"
+version = "0.0.1"
 description = "Schedule service for checking companies websites on new meetup events"
 authors = ["Flict-dev <zhdanom.maksi@gmail.com>"]
 license = "MIT"
@@ -21,6 +21,7 @@ msgspec = "^0.18.0"
 lxml = "^4.9.3"
 sqlalchemy = "^2.0.20"
 apscheduler = "^3.10.4"
+alembic = "^1.11.3"
 
 
 [tool.poetry.group.dev.dependencies]
