@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from sqlalchemy import (
-    DATETIME,
+    DATE,
     UUID,
     Boolean,
     Column,
@@ -32,7 +32,7 @@ metadata = MetaData(naming_convention=convention)
 settings_table = Table(
     "settings",
     metadata,
-    Column("id", UUID, default=uuid4, index=True),
+    Column("id", UUID, default=uuid4, index=True, primary_key=True),
     Column("city", String, index=True, nullable=True),
 )
 
@@ -49,7 +49,7 @@ chats_table = Table(
 structs_table = Table(
     "structs",
     metadata,
-    Column("id", UUID, index=True, default=uuid4),
+    Column("id", UUID, index=True, default=uuid4, primary_key=True),
     Column("events_path", String, nullable=False),
     Column("title_path", String, nullable=False),
     Column("date_path", String, nullable=False),
@@ -61,20 +61,20 @@ structs_table = Table(
 companies_table = Table(
     "companies",
     metadata,
-    Column("id", UUID, index=True, default=uuid4),
+    Column("id", UUID, index=True, default=uuid4, primary_key=True),
     Column("title", String, nullable=False),
     Column("url", String, nullable=False),
     Column("host", String, nullable=True),
     Column("is_active", Boolean, default=False, nullable=False),
-    Column("struct_id", ForeignKey("structs.id"), primary_key=True, nullable=False),
+    Column("struct_id", ForeignKey("structs.id"), nullable=False),
 )
 
 events_table = Table(
     "events",
     metadata,
-    Column("id", UUID, index=True, default=uuid4),
+    Column("id", UUID, index=True, default=uuid4, primary_key=True),
     Column("title", String, nullable=False, index=True),
-    Column("date", DATETIME, nullable=False),
+    Column("date", DATE, nullable=False),
     Column("city", String, nullable=True, index=True),
     Column("preview_link", String, nullable=True),
     Column("page_link", String, nullable=True),
