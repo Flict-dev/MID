@@ -33,7 +33,7 @@ settings_table = Table(
     "settings",
     metadata,
     Column("id", UUID, default=uuid4, index=True, primary_key=True),
-    Column("city", String, index=True, nullable=True),
+    Column("city", String(length=250), index=True, nullable=True),
 )
 
 chats_table = Table(
@@ -42,7 +42,7 @@ chats_table = Table(
     Column("chat_id", Integer, primary_key=True),
     Column("title", String, nullable=False),
     Column("is_notify", Boolean, default=False, nullable=False),
-    Column("settings_id", ForeignKey("settings.id"), primary_key=True),
+    Column("settings_id", ForeignKey("settings.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
@@ -62,20 +62,20 @@ companies_table = Table(
     "companies",
     metadata,
     Column("id", UUID, index=True, default=uuid4, primary_key=True),
-    Column("title", String, nullable=False),
+    Column("title", String(length=300), nullable=False),
     Column("url", String, nullable=False),
-    Column("host", String, nullable=True),
+    Column("host", String(length=250), nullable=True),
     Column("is_active", Boolean, default=False, nullable=False),
-    Column("struct_id", ForeignKey("structs.id"), nullable=False),
+    Column("struct_id", ForeignKey("structs.id", ondelete='CASCADE'), nullable=False),
 )
 
 events_table = Table(
     "events",
     metadata,
     Column("id", UUID, index=True, default=uuid4, primary_key=True),
-    Column("title", String, nullable=False, index=True),
+    Column("title", String(length=250), nullable=False, index=True),
     Column("date", DATE, nullable=False),
-    Column("city", String, nullable=True, index=True),
+    Column("city", String(length=250), nullable=True, index=True),
     Column("preview_link", String, nullable=True),
     Column("page_link", String, nullable=True),
     Column("company_id", ForeignKey("companies.id"), primary_key=True),
