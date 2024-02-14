@@ -2,10 +2,9 @@ from logging import Logger
 from typing import List
 
 from aiohttp import ClientSession
+from events.api.schema import Company
 from msgspec import json
 from user_agent import generate_navigator
-
-from events.api.schema import Company
 
 logger = Logger(__file__)
 

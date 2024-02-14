@@ -1,6 +1,5 @@
 from aio_pika import Connection
 from aio_pika.message import Message
-
 from events.api.schema import Event
 from events.settings import get_settings
 

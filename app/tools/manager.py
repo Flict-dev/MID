@@ -3,7 +3,6 @@ from logging import Logger
 from uuid import UUID
 
 from aio_pika import Connection, connect_robust
-
 from events.api.schema import Company
 from events.settings import get_settings
 from events.utils.deps.http_sender import HTTPSender

@@ -5,11 +5,10 @@ from time import time
 from typing import List
 
 import dateparser
+from events.api.schema import Company, Event
 from lxml import etree
 from lxml.etree import _Element
 from pydantic import UUID4
-
-from events.api.schema import Company, Event
 
 logger = logging.getLogger(__file__)
 
