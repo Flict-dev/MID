@@ -7,7 +7,7 @@ services:
     restart: always
     command:
       - 'redis-server'
-      - '--requirepass $${REDIS_PASSWORD}'
+      - '--requirepass ${DB_PASSWORD}'
       - '--save 60 20'
       - '--maxmemory 300mb'
     ports:
