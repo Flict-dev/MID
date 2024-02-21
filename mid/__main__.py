@@ -6,6 +6,7 @@ from aiogram.fsm.storage.redis import RedisStorage
 from redis.asyncio import Redis
 
 from mid.src.handlers import commands
+from mid.src.handlers.users import about
 from mid.src.settings import get_config
 
 config = get_config()
@@ -17,10 +18,11 @@ async def main():
     print(config.DB_PASSWORD)
     dp = Dispatcher(
         storage=RedisStorage(
-            Redis(host=config.DB_HOST, port=config.DB_PORT, password=config.DB_PASSWORD)
+            Redis(host=config.DB_HOST, port=config.DB_PORT,
+                  password=config.DB_PASSWORD)
         )
     )
-    dp.include_router(commands.router)
+    dp.include_routers(commands.router, about.router)
 
     await dp.start_polling(bot)
 
