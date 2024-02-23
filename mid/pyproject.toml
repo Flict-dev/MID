@@ -16,6 +16,7 @@ lxml = "^5.1.0"
 python-decouple = "^3.8"
 pydantic-settings = "^2.2.0"
 dateparser = "^1.2.0"
+user-agent = "^0.1.10"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"

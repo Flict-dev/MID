@@ -3,7 +3,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 def make_start_keyboard(is_admin: bool) -> ReplyKeyboardMarkup:
     btns = [
-        [KeyboardButton(text="Мероприятия")],
+        [KeyboardButton(text="Лента")],
         [KeyboardButton(text="О сервисе"), KeyboardButton(text="Фидбэк")],
     ]
     if is_admin:
